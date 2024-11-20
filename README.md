@@ -17,3 +17,5 @@ Libraries and packages utilized to analyze the audio will be listed in the requi
 The program display a graphical user interface and allow the user to load a data file from various locations, clean the audio data to be properly analyzed, produce a summary of statistics and measures within the audio sample, provide visualizations of the data, and reduce the RT60 to a maximum voice intelligibility of 0.5 seconds. 
 
 The team hopes it functions as well as it is intended to!
+
+...testing...
