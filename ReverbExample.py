@@ -1,11 +1,47 @@
 #This program is taken from the L26 Lecture Slides
 
+import ffmpeg
+from pydub import AudioSegment
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
-%matplotlib inline #magic function
+import tkinter as tk
+from tkinter import ttk
+from tkinter import filedialog as fd
+from tkinter.messagebox import showinfo
 
-sample_rate, data = wavfile.read("Put audio file name here.extension")
+gfile = ''
+#create the root window
+root = tk.Tk()
+root.title('Tkinter Open File Dialog')
+root.resizable(False, False)
+root.geometry('300x150')
+
+def select_file():
+    filetypes = (('Wav files', '*.wav'), ('Aac files', '*.aac'), ('All files', '*.*'))
+    filename = fd.askopenfilename(title='Open File', initialdir='/', filetypes=filetypes)
+    gfile = filename
+    gfile_label = ttk.Label(root, text=gfile)
+    gfile_label.pack(side="bottom")
+
+#open button
+open_button = ttk.Button(root, text='Open File', command=select_file)
+open_button.pack(expand=True)
+
+src = "pt.aac"
+dst = "pt.wav"
+
+#convert acc to wav
+sound = AudioSegment.from_file(gfile)
+sound.export(dst, format="wav")
+
+raw_audio = AudioSegment.from_file("pt.wav", format="wav")
+channel_count = raw_audio.channels
+mono_wav = raw_audio.set_channels(1)
+mono_wav.export("pt_mono.wav", format="wav")
+mono_wav_audio = AudioSegment.from_file("pt_mono.wav", format="wav")
+
+sample_rate, data = wavfile.read(mono_wav_audio)
 spectrum, freqs, t, im = plt.specgram(data, Fs=sample_rate, NFFT=1024, cmap=plt.get_cmap('autumn_r'))
 
 #prints var outputs
