@@ -1,6 +1,5 @@
 #This program is taken from the L26 Lecture Slides
 
-import ffmpeg
 from pydub import AudioSegment
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,7 +9,6 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 
-gfile = ''
 #create the root window
 root = tk.Tk()
 root.title('Tkinter Open File Dialog')
@@ -18,21 +16,19 @@ root.resizable(False, False)
 root.geometry('300x150')
 
 def select_file():
-    filetypes = (('Wav files', '*.wav'), ('Aac files', '*.aac'), ('All files', '*.*'))
+    filetypes = (('Wav files', '*.wav'), ('Mp3 files', '*.mp3'), ('All files', '*.*'))
     filename = fd.askopenfilename(title='Open File', initialdir='/', filetypes=filetypes)
-    gfile = filename
-    gfile_label = ttk.Label(root, text=gfile)
-    gfile_label.pack(side="bottom")
+    return filename
 
 #open button
 open_button = ttk.Button(root, text='Open File', command=select_file)
 open_button.pack(expand=True)
 
-src = "pt.aac"
+src = "pt.mp3"
 dst = "pt.wav"
 
 #convert acc to wav
-sound = AudioSegment.from_file(gfile)
+sound = AudioSegment.from_mp3()
 sound.export(dst, format="wav")
 
 raw_audio = AudioSegment.from_file("pt.wav", format="wav")
