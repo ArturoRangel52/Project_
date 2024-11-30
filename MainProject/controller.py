@@ -6,7 +6,7 @@ class Controller:
     def __init__(self, model, view):
         self.model = model
         self.view = view
-        self.root = self.view.root
+        self.root = self.view
         self.output_path = "cleaned.wav"
         self.setup_callbacks()
 

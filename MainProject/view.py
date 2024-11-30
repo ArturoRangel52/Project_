@@ -5,14 +5,6 @@ from tkinter.messagebox import showinfo
 
 class View:
     def __init__(self, model):
-        self.message_label = None
-        self.open_button = None
-        self.label = None
-        self.root = tk.Tk()
-        self.root.title('Test')
-        self.root.resizable(False, False)
-        self.root.geometry('700x800')
-
         self.model = model
         self.create_widgets()
         self.target_frequency_index = 0
@@ -42,17 +34,25 @@ class View:
         #message
         self.message_label = ttk.Label(text=' ', foreground='red')
         self.message_label.grid(row=2, column=1, sticky=tk.W)
-    
-    def select_file(self):
 
-        #create the root window
-        root = tk.Tk()
-        root.title('Selected Audio')
-        root.resizable(False, False)
-        root.geometry('1200x600')
+    def select_file(self):
 
         filetypes = (('Wav files', '*.wav'), ('Mp3 files', '*.mp3'), ('All files', '*.*'))
         filename = fd.askopenfilename(title='Open File', initialdir='/', filetypes=filetypes)
 
         #tkinter.messagebox - Tkinter message prompts
-        showinfo(title='Selected File', message=filename)
+        if(filename == ""):
+            showinfo(title='Please Select a File', message="No File Selected.")
+        else:    
+            showinfo(title='Selected File', message=filename)
+
+
+#create the root window
+root = tk.Tk()
+root.title('Selected Audio')
+root.resizable(False, False)
+root.geometry('1200x600')
+
+window = View(root)
+root.mainloop()
+
