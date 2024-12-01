@@ -1,24 +1,33 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
-from tkinter.messagebox import showinfo
 
 class View:
     def __init__(self, model):
+        self.filename = None
         self.message_label = None
         self.open_button = None
         self.label = None
         self.root = tk.Tk()
         self.root.title('Test')
         self.root.resizable(False, False)
-        self.root.geometry('700x800')
+        self.root.geometry('1200x700')
+
+        self.label = ttk.Label(text="Enter Audio Sample: ")
+        self.label.grid(row=1, column=0)
+
+        #open button
+        self.open_button = ttk.Button(text='Open File', command=self.select_file)
+        self.open_button.grid(row=1, column=1, padx=10)
+
+        #message
+        self.message_label = ttk.Label(text='File Name: ')
+        self.message_label.grid(row=1, column=2, sticky=tk.E)
 
         self.model = model
         self.create_widgets()
         self.target_frequency_index = 0
         self.rt60 = 0
-        
-        self.model = None
 
     def set_model(self, model):
         """
@@ -29,30 +38,34 @@ class View:
         self.model = model
 
     def mainloop(self):
-        pass
+        tk.mainloop()
     
     def create_widgets(self):
-        self.label = ttk.Label(text="Enter Audio Sample: ")
-        self.label.grid(row=1, column=0)
-
-        #open button
-        self.open_button = ttk.Button(text='Open File', command=self.select_file)
-        self.open_button.grid(row=1, column=1, padx=10)
-
-        #message
-        self.message_label = ttk.Label(text=' ', foreground='red')
-        self.message_label.grid(row=2, column=1, sticky=tk.W)
+        pass
     
     def select_file(self):
+        filetypes = (('Wav files', '*.wav'), ('Mp3 files', '*.mp3'))
+        self.filename = fd.askopenfilename(title='Open File', initialdir='/', filetypes=filetypes)
+        self.display_filename(self.filename)
+        self.display_time_value()
+        self.display_frequency_value()
+        self.model.set_channels(self.model.convert_audio_to_wav(self.filename))
 
-        #create the root window
-        root = tk.Tk()
-        root.title('Selected Audio')
-        root.resizable(False, False)
-        root.geometry('1200x600')
+    def display_filename(self, filename):
+        self.message_label = ttk.Label(text=self.model.clean_filename(filename))
+        self.message_label.grid(row=1, column=3, sticky=tk.E)
 
-        filetypes = (('Wav files', '*.wav'), ('Mp3 files', '*.mp3'), ('All files', '*.*'))
-        filename = fd.askopenfilename(title='Open File', initialdir='/', filetypes=filetypes)
+    def display_time_value(self):
+        self.model.read_audio(self.filename)
+        self.message_label = ttk.Label(text='Time Value: ' + str(self.model.time_value) + ' seconds')
+        self.message_label.grid(row=3, column=1, sticky=tk.E)
 
-        #tkinter.messagebox - Tkinter message prompts
-        showinfo(title='Selected File', message=filename)
+    def display_frequency_value(self):
+        self.model.calculate_frequency(self.filename)
+        self.message_label = ttk.Label(text='Resonant Frequency Value: ' + str(self.model.frequency) + ' Hz')
+        self.message_label.grid(row=4, column=1, sticky=tk.E)
+
+    def display_difference(self):
+        ### missing
+        self.message_label = ttk.Label(text='Time Difference: ' + str(self.model.time_difference) + ' seconds')
+        self.message_label.grid(row=5, column=1, sticky=tk.E)

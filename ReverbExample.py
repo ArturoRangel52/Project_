@@ -9,12 +9,6 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter.messagebox import showinfo
 
-#create the root window
-root = tk.Tk()
-root.title('Tkinter Open File Dialog')
-root.resizable(False, False)
-root.geometry('300x150')
-
 def select_file():
     filetypes = (('Wav files', '*.wav'), ('Mp3 files', '*.mp3'), ('All files', '*.*'))
     filename = fd.askopenfilename(title='Open File', initialdir='/', filetypes=filetypes)
@@ -27,7 +21,6 @@ open_button.pack(expand=True)
 src = "pt.mp3"
 dst = "pt.wav"
 
-#convert acc to wav
 sound = AudioSegment.from_mp3()
 sound.export(dst, format="wav")
 
@@ -38,7 +31,7 @@ mono_wav.export("pt_mono.wav", format="wav")
 mono_wav_audio = AudioSegment.from_file("pt_mono.wav", format="wav")
 
 sample_rate, data = wavfile.read(mono_wav_audio)
-spectrum, freqs, t, im = plt.specgram(data, Fs=sample_rate, NFFT=1024, cmap=plt.get_cmap('autumn_r'))
+spectrum, freqs= plt.specgram(data, Fs=sample_rate)
 
 #prints var outputs
 def debugg(fstring): #debug variable values
