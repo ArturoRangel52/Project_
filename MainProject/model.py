@@ -1,18 +1,11 @@
 import librosa
-import pydub
-from attr import attributes
 from pydub import AudioSegment
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import wavfile
-import tkinter as tk
-from tkinter import ttk
-from tkinter import filedialog as fd
-import mutagen
 import wave
-from scipy.signal import welch
-from blind_rt60 import BlindRT60
-from scipy.signal import butter, lfilter
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
 
 class Model:
     def __init__(self):
@@ -128,3 +121,37 @@ class Model:
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()  # convert input into array
         return array[idx]
+
+    def graph_Reverberation(self): #copied from repo
+        #Size of graph
+        fig = Figure(figsize = (5, 5))
+        #Data Points of graph
+        xpoints = np.array([0, 6])
+        ypoints = np.array([0, 250])
+        #Creates a subplot
+        plot1 = fig.add_subplot(111)
+        plot1.set_title("Reverberation Graph")
+        plot1.set_ylabel("Decibel (dB)")
+        plot1.set_xlabel("Time (s)")
+        #Sets MatplotLib into the tkinter window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().grid(row = 7, column= 4)
+        canvas.draw()
+        #Calls plot1 to be graphed
+        plot1.plot(xpoints, ypoints)
+
+    def graph_waveform(self):
+        wav_audio = wave.open(self.final_audio, 'rb')
+        n_frames = wav_audio.getnframes()
+        frame_rate = wav_audio.getframerate()
+        waveform = np.frombuffer(wav_audio.readframes(n_frames), dtype=np.int16)
+        time = np.linspace(0, n_frames / frame_rate, num=n_frames)
+        fig = Figure(figsize=(10, 4), dpi=100)
+        ax = fig.add_subplot(111)
+        ax.plot(time, waveform)
+        ax.set_xlabel("Time (s)")
+        ax.set_ylabel("Amplitude")
+        ax.set_title("Waveform Graph")
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().place(relx=0.1, rely=0.3)
+        canvas.draw()
