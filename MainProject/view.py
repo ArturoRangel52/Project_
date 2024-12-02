@@ -46,13 +46,18 @@ class View:
     def select_file(self):
         filetypes = (('Wav files', '*.wav'), ('Mp3 files', '*.mp3'))
         self.filename = fd.askopenfilename(title='Open File', initialdir='/', filetypes=filetypes)
-        self.display_filename(self.filename)
+        self.display_filedata()
+
+    def display_filedata(self):
+        self.display_filename()
         self.display_time_value()
         self.display_frequency_value()
         self.model.set_channels(self.model.convert_audio_to_wav(self.filename))
+        self.model.initialize()
+        self.display_difference() #working on
 
-    def display_filename(self, filename):
-        self.message_label = ttk.Label(text=self.model.clean_filename(filename))
+    def display_filename(self):
+        self.message_label = ttk.Label(text=self.model.clean_filename(self.filename))
         self.message_label.grid(row=1, column=3, sticky=tk.E)
 
     def display_time_value(self):
@@ -62,10 +67,10 @@ class View:
 
     def display_frequency_value(self):
         self.model.calculate_frequency(self.filename)
-        self.message_label = ttk.Label(text='Resonant Frequency Value: ' + str(self.model.frequency) + ' Hz')
+        self.message_label = ttk.Label(text='Resonant Frequency Value: ' + str(round(self.model.frequency, 2)) + ' Hz')
         self.message_label.grid(row=4, column=1, sticky=tk.E)
 
     def display_difference(self):
-        ### missing
-        self.message_label = ttk.Label(text='Time Difference: ' + str(self.model.time_difference) + ' seconds')
+        self.model.calculate_difference()
+        self.message_label = ttk.Label(text='Time Difference: ' + str(round(self.model.difference, 2)) + ' seconds')
         self.message_label.grid(row=5, column=1, sticky=tk.E)
