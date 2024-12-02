@@ -4,6 +4,8 @@ from attr import attributes
 from pydub import AudioSegment
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure 
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk) 
 from scipy.io import wavfile
 import tkinter as tk
 from tkinter import ttk
@@ -128,3 +130,22 @@ class Model:
         array = np.asarray(array)
         idx = (np.abs(array - value)).argmin()  # convert input into array
         return array[idx]
+    
+
+    def graph_Reverberation(self):
+        #Size of graph
+        fig = Figure(figsize = (5, 5))
+        #Data Points of graph
+        xpoints = np.array([0, 6])
+        ypoints = np.array([0, 250])
+        #Creates a subplot
+        plot1 = fig.add_subplot(111)
+        plot1.set_title("Reverberation Graph")
+        plot1.set_ylabel("Decibel (dB)")
+        plot1.set_xlabel("Time (s)")
+        #Sets MatplotLib into the tkiner window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().grid(row = 7, column= 4)
+        canvas.draw()
+        #Calls plot1 to be graphed
+        plot1.plot(xpoints, ypoints)

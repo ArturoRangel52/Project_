@@ -1,6 +1,6 @@
 from model import Model
 from view import View
-from MainProject.controller import Controller
+from controller import Controller
 
 if __name__ == '__main__':
     model = Model()
