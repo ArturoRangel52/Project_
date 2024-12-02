@@ -54,7 +54,7 @@ class View:
         self.display_frequency_value()
         self.model.set_channels(self.model.convert_audio_to_wav(self.filename))
         self.model.initialize()
-        self.display_difference() #working on
+        self.display_difference() #possibly correct, but likely to change
 
     def display_filename(self):
         self.message_label = ttk.Label(text=self.model.clean_filename(self.filename))

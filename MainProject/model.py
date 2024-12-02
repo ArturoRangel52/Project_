@@ -100,14 +100,14 @@ class Model:
         value_of_max_less_25 = value_of_max - 25
         value_of_max_less_25 = self.find_nearest_value(sliced_array, value_of_max_less_25)  # determine -25db down
         index_of_max_less_25 = np.where(data_in_db == value_of_max_less_25)
-        rt20 = (self.t[index_of_max_less_5] - self.t[index_of_max_less_25])[0]  # compute RT20
+        rt20 = (self.t[index_of_max_less_25] - self.t[index_of_max_less_5])[0]  # compute RT20
         # extrapolate rt20 to rt60
         rt60 = 3 * rt20  # extrapolate to RT60
         self.difference = rt60
 
     def initialize(self):
         self.sample_rate, self.data = wavfile.read(self.final_audio)
-        self.spectrum, self.freqs, self.t, self.im = plt.specgram(self.data, Fs=self.sample_rate)
+        self.spectrum, self.freqs, self.t, self.im = plt.specgram(self.data, Fs=self.sample_rate, NFFT=1024, cmap=plt.get_cmap('autumn_r'))
 
     def find_target_frequency(self, x):  # find a mid-range frequency
         for x in self.freqs:
