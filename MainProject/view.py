@@ -33,8 +33,11 @@ class View:
         self.label = ttk.Label(text='Reverberation Graph') #copied from repo
         self.label.grid(row=6, column=0)
         # Plot Button
-        self.open_button = ttk.Button(text='Plot Graph', command=self.model.graph_Reverberation())
+        self.open_button = ttk.Button(text='Plot Graph', command=self.model.graph_Reverberation)
         self.open_button.grid(row=6, column=1, padx=10)
+        #Waveform
+        self.open_button = ttk.Button(text='View Waveform', command=self.model.graph_waveform)
+        self.open_button.grid(row=6, column=2, padx=10)
 
     def set_model(self, model):
         """
@@ -54,9 +57,6 @@ class View:
         filetypes = (('Wav files', '*.wav'), ('Mp3 files', '*.mp3'))
         self.filename = fd.askopenfilename(title='Open File', initialdir='/~', filetypes=filetypes)
         self.display_filedata()
-        #Waveform
-        self.open_button = ttk.Button(text='View Waveform', command=self.model.graph_waveform())
-        self.open_button.grid(row=6, column=2, padx=10)
 
     def display_filedata(self):
         self.display_filename()

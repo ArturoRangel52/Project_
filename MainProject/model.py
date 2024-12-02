@@ -21,6 +21,10 @@ class Model:
         self.difference = 0
         self.final_audio = None
 
+    def initialize(self):
+        self.sample_rate, self.data = wavfile.read(self.final_audio)
+        self.spectrum, self.freqs, self.t, self.im = plt.specgram(self.data, Fs=self.sample_rate, NFFT=1024, cmap=plt.get_cmap('autumn_r'))
+
     def clean_filename(self, filename):
         newname = filename.rsplit('/', 1)[-1]
         return newname
@@ -49,7 +53,6 @@ class Model:
             return audio
         else:
             return audio
-        
 
     def set_channels(self, audio):
         newaudio = AudioSegment.from_wav(audio)
@@ -61,12 +64,6 @@ class Model:
             mono_wav_audio = mono_wav.export(format="wav")
             self.final_audio = mono_wav_audio
 
-    def find_target_freq(freqs):  # find a mid-range frequency
-        for x in freqs:
-            if x > 1000:
-                break
-        return x
-
     def calculate_frequency(self, audio):
         data, sample_rate = librosa.load(audio)
         # Apply FFT
@@ -77,7 +74,7 @@ class Model:
         self.frequency = frequencies[np.argmax(magnitude)]
 
     def calculate_difference(self):
-        data_in_db = self.frequency_check()
+        data_in_db = self.mid_frequency_check()
         # find index of a max value
         index_of_max = np.argmax(data_in_db)
         # for computation and marking plot
@@ -96,25 +93,112 @@ class Model:
         rt20 = (self.t[index_of_max_less_25] - self.t[index_of_max_less_5])[0]  # compute RT20
         # extrapolate rt20 to rt60
         rt60 = 3 * rt20  # extrapolate to RT60
-        self.difference = rt60
+        mid_rt60 = rt60
 
-    def initialize(self):
-        self.sample_rate, self.data = wavfile.read(self.final_audio)
-        self.spectrum, self.freqs, self.t, self.im = plt.specgram(self.data, Fs=self.sample_rate, NFFT=1024, cmap=plt.get_cmap('autumn_r'))
+        data_in_db = self.low_frequency_check()
+        # find index of a max value
+        index_of_max = np.argmax(data_in_db)
+        # for computation and marking plot
+        value_of_max = data_in_db[index_of_max]
+        # slice array from a max value
+        sliced_array = data_in_db[index_of_max:]
+        # determine 5db less of max value
+        value_of_max_less_5 = value_of_max - 5
+        # determine absolute value and subtract less 5 db value
+        value_of_max_less_5 = self.find_nearest_value(sliced_array, value_of_max_less_5)
+        index_of_max_less_5 = np.where(data_in_db == value_of_max_less_5)
+        # slice array from a max -5db
+        value_of_max_less_25 = value_of_max - 25
+        value_of_max_less_25 = self.find_nearest_value(sliced_array, value_of_max_less_25)  # determine -25db down
+        index_of_max_less_25 = np.where(data_in_db == value_of_max_less_25)
+        rt20 = (self.t[index_of_max_less_25] - self.t[index_of_max_less_5])[0]  # compute RT20
+        # extrapolate rt20 to rt60
+        rt60 = 3 * rt20  # extrapolate to RT60
+        low_rt60 = rt60
 
-    def find_target_frequency(self, x):  # find a mid-range frequency
+        data_in_db = self.high_frequency_check()
+        # find index of a max value
+        index_of_max = np.argmax(data_in_db)
+        # for computation and marking plot
+        value_of_max = data_in_db[index_of_max]
+        # slice array from a max value
+        sliced_array = data_in_db[index_of_max:]
+        # determine 5db less of max value
+        value_of_max_less_5 = value_of_max - 5
+        # determine absolute value and subtract less 5 db value
+        value_of_max_less_5 = self.find_nearest_value(sliced_array, value_of_max_less_5)
+        index_of_max_less_5 = np.where(data_in_db == value_of_max_less_5)
+        # slice array from a max -5db
+        value_of_max_less_25 = value_of_max - 25
+        value_of_max_less_25 = self.find_nearest_value(sliced_array, value_of_max_less_25)  # determine -25db down
+        index_of_max_less_25 = np.where(data_in_db == value_of_max_less_25)
+        rt20 = (self.t[index_of_max_less_25] - self.t[index_of_max_less_5])[0]  # compute RT20
+        # extrapolate rt20 to rt60
+        rt60 = 3 * rt20  # extrapolate to RT60
+        high_rt60 = rt60
+        total_rt60 = high_rt60 + low_rt60 + mid_rt60 / 3
+        self.difference = total_rt60 - 0.5
+
+    def find_mid_frequency(self, x):  # find a mid-range frequency
         for x in self.freqs:
             if x > 1000:
                 break
         return x
 
-    def frequency_check(self):  # choose a frequency to check
-        target_frequency = self.find_target_frequency(self.freqs)
+    def find_low_frequency(self, x):
+        for x in self.freqs:
+            if 60 < x < 250:
+                break
+        return x
+
+    def find_high_frequency(self, x):
+        for x in self.freqs:
+            if 5000 < x < 10000:
+                break
+        return x
+
+    def find_mid_range(self, x): #working on
+        mid_range = []
+        for x in self.freqs:
+            if x > 1000:
+                mid_range.append(x)
+        return mid_range
+
+    def find_low_range(self, x): #working on
+        low_range = []
+        for x in self.freqs:
+            if 60 < x < 250:
+                low_range.append(x)
+        return low_range
+
+    def find_high_range(self, x): #working on
+        high_range = []
+        for x in self.freqs:
+            if 5000 < x < 10000:
+                high_range.append(x)
+        return high_range
+
+    def mid_frequency_check(self):  # choose a frequency to check
+        target_frequency = self.find_mid_frequency(self.freqs)
         index_of_frequency = np.where(self.freqs == target_frequency)[0][0]  # find index of target_frequency
         # find a sound data for a particular frequency
         data_for_frequency = self.spectrum[index_of_frequency]
         # change a digital signal for values in decibels
         data_in_db_fun = 10 * np.log10(data_for_frequency)  # use natural logarithm to get more audio-natural output
+        return data_in_db_fun
+
+    def low_frequency_check(self):
+        target_frequency = self.find_low_frequency(self.freqs)
+        index_of_low_frequency = np.where(self.freqs == target_frequency)[0][0]
+        data_for_frequency = self.spectrum[index_of_low_frequency]
+        data_in_db_fun = 10 * np.log10(data_for_frequency)
+        return data_in_db_fun
+
+    def high_frequency_check(self):
+        target_frequency = self.find_high_frequency(self.freqs)
+        index_of_high_frequency = np.where(self.freqs == target_frequency)[0][0]
+        data_for_frequency = self.spectrum[index_of_high_frequency]
+        data_in_db_fun = 10 * np.log10(data_for_frequency)
         return data_in_db_fun
 
     def find_nearest_value(self, array, value):  # pass in sliced array list and value less 5db
