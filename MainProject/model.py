@@ -210,19 +210,85 @@ class Model:
         #Size of graph
         fig = Figure(figsize = (5, 5))
         #Data Points of graph
-        xpoints = np.array([0, 6])
-        ypoints = np.array([0, 250])
+        low_dB = self.low_frequency_check()
+        mid_dB = self.mid_frequency_check()
+        high_dB = self.high_frequency_check()
         #Creates a subplot
         plot1 = fig.add_subplot(111)
+        #labels the graph
         plot1.set_title("Reverberation Graph")
         plot1.set_ylabel("Decibel (dB)")
         plot1.set_xlabel("Time (s)")
+        #plots all 3 data values on to the graph
+        plot1.plot(low_dB)
+        plot1.plot(mid_dB)
+        plot1.plot(high_dB)
+        #, location of legend is lower right
+        plot1.legend(["low frequency","mid frequency","high frequency"], loc="lower right")
         #Sets MatplotLib into the tkinter window
         canvas = FigureCanvasTkAgg(fig)
-        canvas.get_tk_widget().grid(row = 7, column= 4)
+        canvas.get_tk_widget().grid(row = 8, column= 4)
         canvas.draw()
-        #Calls plot1 to be graphed
-        plot1.plot(xpoints, ypoints)
+
+    def graph_low_frequency(self):
+        #Size of graph
+        fig = Figure(figsize = (5, 5))
+        #Data Points of graph
+        low_dB = self.low_frequency_check()
+        #Creates a subplot
+        plot1 = fig.add_subplot(111)
+        #labels the graph
+        plot1.set_title("Reverberation Graph")
+        plot1.set_ylabel("Decibel (dB)")
+        plot1.set_xlabel("Time (s)")
+        #plots all 3 data values on to the graph
+        plot1.plot(low_dB)
+        #, location of legend is lower right
+        plot1.legend(["low frequency"], loc="lower right")
+        #Sets MatplotLib into the tkinter window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().grid(row = 8, column= 4)
+        canvas.draw()
+
+    def graph_mid_frequency(self):
+        #Size of graph
+        fig = Figure(figsize = (5, 5))
+        #Data Points of graph
+        mid_dB = self.mid_frequency_check()
+        #Creates a subplot
+        plot1 = fig.add_subplot(111)
+        #labels the graph
+        plot1.set_title("Reverberation Graph")
+        plot1.set_ylabel("Decibel (dB)")
+        plot1.set_xlabel("Time (s)")
+        #plots all 3 data values on to the graph
+        plot1.plot(mid_dB)
+        #, location of legend is lower right
+        plot1.legend(["mid frequency"], loc="lower right")
+        #Sets MatplotLib into the tkinter window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().grid(row = 8, column= 4)
+        canvas.draw()
+
+    def graph_high_frequency(self):
+        #Size of graph
+        fig = Figure(figsize = (5, 5))
+        #Data Points of graph
+        high_dB = self.high_frequency_check()
+        #Creates a subplot
+        plot1 = fig.add_subplot(111)
+        #labels the graph
+        plot1.set_title("Reverberation Graph")
+        plot1.set_ylabel("Decibel (dB)")
+        plot1.set_xlabel("Time (s)")
+        #plots all 3 data values on to the graph
+        plot1.plot(high_dB)
+        #, location of legend is lower right
+        plot1.legend(["high frequency"], loc="lower right")
+        #Sets MatplotLib into the tkinter window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().grid(row = 8, column= 4)
+        canvas.draw()
 
     def graph_waveform(self):
         wav_audio = wave.open(self.final_audio, 'rb')
