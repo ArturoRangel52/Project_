@@ -38,6 +38,18 @@ class View:
         #Waveform
         self.open_button = ttk.Button(text='View Waveform', command=self.model.graph_waveform)
         self.open_button.grid(row=6, column=2, padx=10)
+        #Low Frequency
+        self.open_button = ttk.Button(text='Low Frequency', command=self.model.graph_low_frequency)
+        self.open_button.grid(row=7, column=1, padx=10)
+        #Mid Frequency
+        self.open_button = ttk.Button(text='Mid Frequency', command=self.model.graph_mid_frequency)
+        self.open_button.grid(row=7, column=2, padx=10)
+        #High Frequency
+        self.open_button = ttk.Button(text='High Frequency', command=self.model.graph_high_frequency)
+        self.open_button.grid(row=7, column=3, padx=10)
+        #Spectrogram
+        self.open_button = ttk.Button(text='Spectrogram', command=self.model.graph_spectrogram)
+        self.open_button.grid(row=7, column=4, padx=10)
 
     def set_model(self, model):
         """

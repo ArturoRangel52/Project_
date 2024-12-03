@@ -157,21 +157,21 @@ class Model:
                 break
         return x
 
-    def find_mid_range(self, x): #working on
+    def find_mid_range(self, x):
         mid_range = []
         for x in self.freqs:
             if x > 1000:
                 mid_range.append(x)
         return mid_range
 
-    def find_low_range(self, x): #working on
+    def find_low_range(self, x):
         low_range = []
         for x in self.freqs:
             if 60 < x < 250:
                 low_range.append(x)
         return low_range
 
-    def find_high_range(self, x): #working on
+    def find_high_range(self, x):
         high_range = []
         for x in self.freqs:
             if 5000 < x < 10000:
@@ -239,3 +239,16 @@ class Model:
         canvas = FigureCanvasTkAgg(fig)
         canvas.get_tk_widget().place(relx=0.1, rely=0.3)
         canvas.draw()
+
+    def graph_spectrogram(self):
+        sample_rate, samples = wavfile.read(self.final_audio)
+        # Create a figure for the spectrogram
+        fig, ax = plt.subplots()
+        ax.specgram(samples, Fs=sample_rate)
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Frequency')
+        ax.set_title('Spectrogram')
+        # Display the spectrogram in the Tkinter window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.draw()
+        canvas.get_tk_widget().place(relx=0.1, rely=0.3)
