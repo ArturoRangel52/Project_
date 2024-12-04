@@ -30,15 +30,10 @@ class Model:
         return newname
 
     def read_audio(self, file_path):
-        try:
-            audio = AudioSegment.from_file(file_path)
-            frames = wave.open(file_path, "r").getnframes()
-            rate = wave.open(file_path, "r").getframerate()
-            self.time_value = round(frames / float(rate), 2)
-            return audio
-        except Exception as e:
-            print(f"Error reading audio file: {e}")
-            return None
+        audio = AudioSegment.from_file(file_path)
+        frames = wave.open(file_path, "r").getnframes()
+        rate = wave.open(file_path, "r").getframerate()
+        self.time_value = round(frames / float(rate), 2)
 
     def convert_audio_to_wav(self, audio):
         format_ = audio.rsplit('/', 1)[-1].rsplit('.', 1)[1]
@@ -139,39 +134,39 @@ class Model:
         total_rt60 = high_rt60 + low_rt60 + mid_rt60 / 3
         self.difference = total_rt60 - 0.5
 
-    def find_mid_frequency(self, x):  # find a mid-range frequency
+    def find_mid_frequency(self, x):  # find mid-range frequency
         for x in self.freqs:
             if x > 1000:
                 break
         return x
 
-    def find_low_frequency(self, x):
+    def find_low_frequency(self, x): # find low-range frequency
         for x in self.freqs:
             if 60 < x < 250:
                 break
         return x
 
-    def find_high_frequency(self, x):
+    def find_high_frequency(self, x): #find high-range frequency
         for x in self.freqs:
             if 5000 < x < 10000:
                 break
         return x
 
-    def find_mid_range(self, x):
+    def find_mid_range(self, x): #likely not used
         mid_range = []
         for x in self.freqs:
             if x > 1000:
                 mid_range.append(x)
         return mid_range
 
-    def find_low_range(self, x):
+    def find_low_range(self, x): #likely not used
         low_range = []
         for x in self.freqs:
             if 60 < x < 250:
                 low_range.append(x)
         return low_range
 
-    def find_high_range(self, x):
+    def find_high_range(self, x): #likely not used
         high_range = []
         for x in self.freqs:
             if 5000 < x < 10000:
@@ -206,23 +201,89 @@ class Model:
         idx = (np.abs(array - value)).argmin()  # convert input into array
         return array[idx]
 
-    def graph_Reverberation(self): #copied from repo
+    def graph_Reverberation(self):
         #Size of graph
         fig = Figure(figsize = (5, 5))
         #Data Points of graph
-        xpoints = np.array([0, 6])
-        ypoints = np.array([0, 250])
+        low_dB = self.low_frequency_check()
+        mid_dB = self.mid_frequency_check()
+        high_dB = self.high_frequency_check()
         #Creates a subplot
         plot1 = fig.add_subplot(111)
+        #labels the graph
         plot1.set_title("Reverberation Graph")
         plot1.set_ylabel("Decibel (dB)")
         plot1.set_xlabel("Time (s)")
+        # plots all 3 data values on to the graph
+        plot1.plot(low_dB)
+        plot1.plot(mid_dB)
+        plot1.plot(high_dB)
+        # location of legend is lower right
+        plot1.legend(["low frequency", "mid frequency", "high frequency"], loc="lower right")
         #Sets MatplotLib into the tkinter window
         canvas = FigureCanvasTkAgg(fig)
-        canvas.get_tk_widget().grid(row = 7, column= 4)
+        canvas.get_tk_widget().place(relx=0.1, rely=0.3)
         canvas.draw()
-        #Calls plot1 to be graphed
-        plot1.plot(xpoints, ypoints)
+
+    def graph_low_frequency(self):
+        # Size of graph
+        fig = Figure(figsize=(5, 5))
+        # Data Points of graph
+        low_dB = self.low_frequency_check()
+        # Creates a subplot
+        plot1 = fig.add_subplot(111)
+        # labels the graph
+        plot1.set_title("Reverberation Graph")
+        plot1.set_ylabel("Decibel (dB)")
+        plot1.set_xlabel("Time (s)")
+        # plots all 3 data values on to the graph
+        plot1.plot(low_dB)
+        # , location of legend is lower right
+        plot1.legend(["low frequency"], loc="lower right")
+        # Sets MatplotLib into the tkinter window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().place(relx=0.1, rely=0.3)
+        canvas.draw()
+
+    def graph_mid_frequency(self):
+        # Size of graph
+        fig = Figure(figsize=(5, 5))
+        # Data Points of graph
+        mid_dB = self.mid_frequency_check()
+        # Creates a subplot
+        plot1 = fig.add_subplot(111)
+        # labels the graph
+        plot1.set_title("Reverberation Graph")
+        plot1.set_ylabel("Decibel (dB)")
+        plot1.set_xlabel("Time (s)")
+        # plots all 3 data values on to the graph
+        plot1.plot(mid_dB)
+        # , location of legend is lower right
+        plot1.legend(["mid frequency"], loc="lower right")
+        # Sets MatplotLib into the tkinter window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().place(relx=0.1, rely=0.3)
+        canvas.draw()
+
+    def graph_high_frequency(self):
+        # Size of graph
+        fig = Figure(figsize=(5, 5))
+        # Data Points of graph
+        high_dB = self.high_frequency_check()
+        # Creates a subplot
+        plot1 = fig.add_subplot(111)
+        # labels the graph
+        plot1.set_title("Reverberation Graph")
+        plot1.set_ylabel("Decibel (dB)")
+        plot1.set_xlabel("Time (s)")
+        # plots all 3 data values on to the graph
+        plot1.plot(high_dB)
+        # , location of legend is lower right
+        plot1.legend(["high frequency"], loc="lower right")
+        # Sets MatplotLib into the tkinter window
+        canvas = FigureCanvasTkAgg(fig)
+        canvas.get_tk_widget().place(relx=0.1, rely=0.3)
+        canvas.draw()
 
     def graph_waveform(self):
         wav_audio = wave.open(self.final_audio, 'rb')
