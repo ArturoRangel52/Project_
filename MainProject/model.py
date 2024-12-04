@@ -5,11 +5,11 @@ import matplotlib.pyplot as plt
 from scipy.io import wavfile
 import wave
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk)
+from matplotlib.backends.backend_tkagg import (FigureCanvasTkAgg, NavigationToolbar2Tk) #imports all necessary libraries
 
-class Model:
-    def __init__(self):
-        self.sample_rate = 0
+class Model: #creates model class
+    def __init__(self): #init function
+        self.sample_rate = 0 #initializes and defines every variable that will utilized
         self.data = None
         self.channels = 0
         self.freqs = None
@@ -21,54 +21,54 @@ class Model:
         self.difference = 0
         self.final_audio = None
 
-    def initialize(self):
-        self.sample_rate, self.data = wavfile.read(self.final_audio)
+    def initialize(self): #function to initialize variables in model class
+        self.sample_rate, self.data = wavfile.read(self.final_audio) #extracts sample rate and data array from processed audio
+        # assigns values to variables using values from audio as parameters
         self.spectrum, self.freqs, self.t, self.im = plt.specgram(self.data, Fs=self.sample_rate, NFFT=1024, cmap=plt.get_cmap('autumn_r'))
 
-    def clean_filename(self, filename):
-        newname = filename.rsplit('/', 1)[-1]
-        return newname
+    def clean_filename(self, filename): #function to remove metadata
+        newname = filename.rsplit('/', 1)[-1] #removes metadata before function name i.e. where last / is
+        return newname #returns to display audio
 
-    def read_audio(self, file_path):
-        audio = AudioSegment.from_file(file_path)
-        frames = wave.open(file_path, "r").getnframes()
-        rate = wave.open(file_path, "r").getframerate()
-        self.time_value = round(frames / float(rate), 2)
+    def read_audio(self, file_path): #function to evaluate duration of audio
+        frames = wave.open(file_path, "r").getnframes() #extract number of frames
+        rate = wave.open(file_path, "r").getframerate() #extract frame rate
+        self.time_value = round(frames / float(rate), 2) #calculates time in seconds and assigns to variable
 
-    def convert_audio_to_wav(self, audio):
-        format_ = audio.rsplit('/', 1)[-1].rsplit('.', 1)[1]
-        if format_ == 'mp3':
+    def convert_audio_to_wav(self, audio): #function to convert audio from mp3 to wav if necessary
+        format_ = audio.rsplit('/', 1)[-1].rsplit('.', 1)[1] #extracts format
+        if format_ == 'mp3': #condition to check format
             try:
-                newaudio = AudioSegment.from_mp3(audio)
+                newaudio = AudioSegment.from_mp3(audio) #try is implemented due to audiosegent having difficulty with some mp3 files
             except:
-                newaudio = AudioSegment.from_file(audio)
+                newaudio = AudioSegment.from_file(audio) #if error occurs, the audio format is changed to mp4
                 audio = newaudio.export(format="mp4")
                 newaudio = AudioSegment.from_file(audio, format="mp4")
-            audio = newaudio.export(format="wav")
-            return audio
+            audio = newaudio.export(format="wav") #audio format is changed to wav
+            return audio #returns audio in new format
         else:
-            return audio
+            return audio #returns audio without change
 
-    def set_channels(self, audio):
-        newaudio = AudioSegment.from_wav(audio)
-        num_channels = newaudio.channels
-        if num_channels == 1:
-            self.final_audio = audio
+    def set_channels(self, audio): #function to convert multi-channel audio to one channel
+        newaudio = AudioSegment.from_wav(audio) #reads audio
+        num_channels = newaudio.channels #extracts number of channels in audio
+        if num_channels == 1: #condition to check number of channels
+            self.final_audio = audio #assigns audio without change
         else:
-            mono_wav = newaudio.set_channels(1)
-            mono_wav_audio = mono_wav.export(format="wav")
-            self.final_audio = mono_wav_audio
+            mono_wav = newaudio.set_channels(1) #sets channels to one
+            mono_wav_audio = mono_wav.export(format="wav") #exports audio data as wav file
+            self.final_audio = mono_wav_audio #assigns audio in single channel format
 
-    def calculate_frequency(self, audio):
-        data, sample_rate = librosa.load(audio)
+    def calculate_frequency(self, audio): #function to calculate resonant frequency
+        data, sample_rate = librosa.load(audio) #loads audio
         # Apply FFT
         fft_data = np.fft.fft(data)
         frequencies = np.fft.fftfreq(len(fft_data), 1 / sample_rate)
         # Identify the resonant frequency
         magnitude = np.abs(fft_data)
-        self.frequency = frequencies[np.argmax(magnitude)]
+        self.frequency = frequencies[np.argmax(magnitude)] #assigns resonant frequency value
 
-    def calculate_difference(self):
+    def calculate_difference(self): #calculates difference in RT60 values minus 0.5 seconds
         data_in_db = self.mid_frequency_check()
         # find index of a max value
         index_of_max = np.argmax(data_in_db)
@@ -89,7 +89,7 @@ class Model:
         # extrapolate rt20 to rt60
         rt60 = 3 * rt20  # extrapolate to RT60
         mid_rt60 = rt60
-
+        ###
         data_in_db = self.low_frequency_check()
         # find index of a max value
         index_of_max = np.argmax(data_in_db)
@@ -110,7 +110,7 @@ class Model:
         # extrapolate rt20 to rt60
         rt60 = 3 * rt20  # extrapolate to RT60
         low_rt60 = rt60
-
+        ###
         data_in_db = self.high_frequency_check()
         # find index of a max value
         index_of_max = np.argmax(data_in_db)
@@ -131,22 +131,22 @@ class Model:
         # extrapolate rt20 to rt60
         rt60 = 3 * rt20  # extrapolate to RT60
         high_rt60 = rt60
-        total_rt60 = high_rt60 + low_rt60 + mid_rt60 / 3
-        self.difference = total_rt60 - 0.5
+        total_rt60 = high_rt60 + low_rt60 + mid_rt60 / 3 #averages rt60 value
+        self.difference = total_rt60 - 0.5 #subtracts 0.5 seconds and assigns value to variable
 
-    def find_mid_frequency(self, x):  # find mid-range frequency
+    def find_mid_frequency(self, x):  # finds mid-range frequency
         for x in self.freqs:
             if x > 1000:
                 break
         return x
 
-    def find_low_frequency(self, x): # find low-range frequency
+    def find_low_frequency(self, x): # finds low-range frequency
         for x in self.freqs:
             if 60 < x < 250:
                 break
         return x
 
-    def find_high_frequency(self, x): #find high-range frequency
+    def find_high_frequency(self, x): #finds high-range frequency
         for x in self.freqs:
             if 5000 < x < 10000:
                 break
@@ -161,14 +161,14 @@ class Model:
         data_in_db_fun = 10 * np.log10(data_for_frequency)  # use natural logarithm to get more audio-natural output
         return data_in_db_fun
 
-    def low_frequency_check(self):
+    def low_frequency_check(self): #same as mid_frequency_check but for low range
         target_frequency = self.find_low_frequency(self.freqs)
         index_of_low_frequency = np.where(self.freqs == target_frequency)[0][0]
         data_for_frequency = self.spectrum[index_of_low_frequency]
         data_in_db_fun = 10 * np.log10(data_for_frequency)
         return data_in_db_fun
 
-    def high_frequency_check(self):
+    def high_frequency_check(self): #same as mid_frequency_check but for high range
         target_frequency = self.find_high_frequency(self.freqs)
         index_of_high_frequency = np.where(self.freqs == target_frequency)[0][0]
         data_for_frequency = self.spectrum[index_of_high_frequency]
@@ -264,12 +264,12 @@ class Model:
         canvas.get_tk_widget().place(relx=0.1, rely=0.3)
         canvas.draw()
 
-    def graph_waveform(self):
+    def graph_waveform(self): #function to graph waveform of audio
         wav_audio = wave.open(self.final_audio, 'rb')
         n_frames = wav_audio.getnframes()
         frame_rate = wav_audio.getframerate()
-        waveform = np.frombuffer(wav_audio.readframes(n_frames), dtype=np.int16)
-        time = np.linspace(0, n_frames / frame_rate, num=n_frames)
+        waveform = np.frombuffer(wav_audio.readframes(n_frames), dtype=np.int16) #y-axis
+        time = np.linspace(0, n_frames / frame_rate, num=n_frames) #x-axis
         fig = Figure(figsize=(10, 4), dpi=100)
         ax = fig.add_subplot(111)
         ax.plot(time, waveform)
@@ -280,7 +280,7 @@ class Model:
         canvas.get_tk_widget().place(relx=0.1, rely=0.3)
         canvas.draw()
 
-    def graph_spectrogram(self):
+    def graph_spectrogram(self): #function to graph spectrogram of audio
         sample_rate, samples = wavfile.read(self.final_audio)
         # Create a figure for the spectrogram
         fig, ax = plt.subplots()

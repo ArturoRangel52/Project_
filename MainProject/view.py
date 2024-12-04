@@ -1,7 +1,7 @@
 import tkinter as tk
 
 class View:
-    def __init__(self, model):
+    def __init__(self, model): #variables initialized and defined
         self.filename = None
         self.message_label = None
         self.open_button = None

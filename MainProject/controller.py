@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 
 class Controller:
-    def __init__(self, model, view):
+    def __init__(self, model, view): #variables initialized and defined
         self.model = model
         self.view = view
         self.root = self.view.root
