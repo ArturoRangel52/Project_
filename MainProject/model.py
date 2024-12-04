@@ -152,27 +152,6 @@ class Model:
                 break
         return x
 
-    def find_mid_range(self, x): #likely not used
-        mid_range = []
-        for x in self.freqs:
-            if x > 1000:
-                mid_range.append(x)
-        return mid_range
-
-    def find_low_range(self, x): #likely not used
-        low_range = []
-        for x in self.freqs:
-            if 60 < x < 250:
-                low_range.append(x)
-        return low_range
-
-    def find_high_range(self, x): #likely not used
-        high_range = []
-        for x in self.freqs:
-            if 5000 < x < 10000:
-                high_range.append(x)
-        return high_range
-
     def mid_frequency_check(self):  # choose a frequency to check
         target_frequency = self.find_mid_frequency(self.freqs)
         index_of_frequency = np.where(self.freqs == target_frequency)[0][0]  # find index of target_frequency
